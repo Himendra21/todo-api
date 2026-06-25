@@ -1,61 +1,1729 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
-    <h1>Todo App</h1>
-</head>Todo
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Focus. Designed by Apple Inc." />
+    <title>Focus</title>
+
+    <style>
+        @layer reset, base, components, utilities;
+
+        @layer reset {
+          *, *::before, *::after { box-sizing: border-box; }
+          html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+          body, h1, h2, h3, h4, p, ul, li, button, input, select, dialog { margin: 0; }
+          ul { padding: 0; list-style: none; }
+          button, input, select { font: inherit; }
+          button { cursor: pointer; border: none; background: none; }
+          img, svg { display: block; max-width: 100%; }
+          :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: inherit; }
+        }
+
+        @layer base {
+          :root {
+            /* Premium Apple / Vercel Dark Mode */
+            --bg0: #000000;
+            --bg1: #0a0a0a;
+            --surface: rgba(28, 28, 30, 0.65);
+            --surface-2: rgba(44, 44, 46, 0.7);
+            --surface-3: rgba(58, 58, 60, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
+            --border-2: rgba(255, 255, 255, 0.15);
+            --text: #ffffff;
+            --muted: #8e8e93;
+            --muted-2: #636366;
+            --accent: #0a84ff; /* Apple Blue */
+            --accent-2: #5e5ce6;
+            --success: #30d158;
+            --warning: #ffd60a;
+            --danger: #ff453a;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
+            --shadow-lg: 0 32px 80px rgba(0,0,0,0.7);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            --speed: 200ms;
+            --maxw: 1024px;
+          }
+
+          html[data-theme="light"] {
+            color-scheme: light;
+            --bg0: #f5f5f7;
+            --bg1: #ffffff;
+            --surface: rgba(255, 255, 255, 0.75);
+            --surface-2: rgba(242, 242, 247, 0.8);
+            --surface-3: rgba(229, 229, 234, 0.9);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-2: rgba(0, 0, 0, 0.15);
+            --text: #1d1d1f;
+            --muted: #86868b;
+            --muted-2: #aeaeb2;
+            --accent: #007aff;
+            --accent-2: #5856d6;
+            --success: #34c759;
+            --danger: #ff3b30;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 32px 80px rgba(0,0,0,0.12);
+          }
+
+          html { color-scheme: dark light; }
+          body {
+            min-height: 100dvh;
+            /* Ultimate system font stack for Apple/Premium feel */
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background-color: var(--bg0);
+            background-image:
+              radial-gradient(circle at top center, var(--surface-2) 0%, transparent 60%);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+
+          .app {
+            width: min(var(--maxw), calc(100% - 2rem));
+            margin: 3rem auto 4rem;
+          }
+
+          /* Premium Glassmorphism Shell */
+          .shell {
+            position: relative;
+            border-radius: var(--radius-xl);
+            background: var(--surface);
+            box-shadow: inset 0 0 0 1px var(--border), var(--shadow-lg);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            overflow: hidden;
+          }
+
+          .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem 1rem;
+            border-bottom: 1px solid var(--border);
+          }
+
+          .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
+
+          .brand-mark {
+            font-size: 1.8rem;
+            color: var(--text);
+            display: grid;
+            place-items: center;
+          }
+
+          .brand h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+          }
+
+          .brand p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            margin-top: 0.1rem;
+          }
+
+          .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          /* Premium Controls */
+          .pill, .icon-btn, .ghost-btn, .chip, .filter-btn, .tag, .mini-btn {
+            box-shadow: inset 0 0 0 1px var(--border);
+            background: rgba(255,255,255,0.02);
+            color: var(--text);
+            border-radius: 99px;
+            transition: all var(--speed) cubic-bezier(0.2, 0.8, 0.2, 1);
+            font-weight: 500;
+          }
+
+          html[data-theme="light"] .pill,
+          html[data-theme="light"] .icon-btn,
+          html[data-theme="light"] .ghost-btn,
+          html[data-theme="light"] .chip,
+          html[data-theme="light"] .filter-btn,
+          html[data-theme="light"] .tag,
+          html[data-theme="light"] .mini-btn {
+            background: rgba(0,0,0,0.02);
+          }
+
+          .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+          }
+
+          .icon-btn, .ghost-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+          }
+
+          .icon-btn:hover, .ghost-btn:hover, .chip:hover, .filter-btn:hover, .mini-btn:hover {
+            background: var(--surface-2);
+            box-shadow: inset 0 0 0 1px var(--border-2);
+            transform: scale(1.02);
+          }
+
+          .icon-btn:active, .ghost-btn:active, .chip:active {
+            transform: scale(0.98);
+          }
+
+          .kbd {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            box-shadow: inset 0 0 0 1px var(--border);
+            color: var(--muted);
+            background: var(--surface-2);
+          }
+
+          .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 0;
+          }
+
+          .panel {
+            padding: 2rem;
+            border-right: 1px solid var(--border);
+          }
+
+          .sidebar {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            background: rgba(0,0,0,0.05);
+          }
+
+          .headline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+          }
+
+          .headline h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+          }
+
+          .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.75rem;
+            border-radius: 99px;
+            box-shadow: inset 0 0 0 1px var(--border);
+            background: var(--surface-2);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+
+          .hero-copy p {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.5;
+            max-width: 90%;
+          }
+
+          /* Clean Metrics */
+          .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+          }
+
+          .stats-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+          }
+
+          .stats-card .label { color: var(--muted); font-size: 0.8rem; font-weight: 500; }
+          .stats-card .value { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.04em; }
+          .stats-card .sub { color: var(--muted-2); font-size: 0.75rem; }
+
+          /* Inputs */
+          .composer { margin-top: 2rem; display: grid; gap: 1rem; }
+          .composer form { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; }
+
+          .input, .select, .search, .palette-input {
+            width: 100%;
+            background: var(--surface-2);
+            box-shadow: inset 0 0 0 1px var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: all var(--speed);
+            border: none;
+          }
+
+          .input::placeholder, .search::placeholder { color: var(--muted); }
+
+          .input:focus, .select:focus, .search:focus, .palette-input:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 3px rgba(10, 132, 255, 0.2);
+            background: var(--surface-3);
+          }
+
+          .action-btn {
+            background: var(--text);
+            color: var(--bg0);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: transform var(--speed);
+          }
+          .action-btn:hover { transform: scale(1.02); }
+          .action-btn:active { transform: scale(0.98); }
+
+          .select { appearance: none; min-width: 11rem; }
+
+          .search-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 0.5rem; align-items: center; }
+
+          .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+          .chip, .filter-btn, .tag { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+
+          .chip.active, .filter-btn.active, .tag.active {
+            background: var(--text);
+            color: var(--bg0);
+            box-shadow: none;
+          }
+
+          .bulk-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--surface-2);
+            border-radius: var(--radius-md);
+            box-shadow: inset 0 0 0 1px var(--border);
+          }
+          .bulk-bar.show { display: flex; animation: slideDown 0.2s ease-out; }
+
+          /* Apple-style Todo List */
+          .todo-stack { display: grid; gap: 0.5rem; margin-top: 1.5rem; }
+
+          .todo-card {
+            display: grid;
+            grid-template-columns: auto auto auto minmax(0, 1fr) auto;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            box-shadow: inset 0 0 0 1px var(--border);
+            transition: all var(--speed);
+            opacity: 0;
+            transform: translateY(4px);
+          }
+
+          .todo-card.is-visible { opacity: 1; transform: translateY(0); }
+          .todo-card:hover { background: var(--surface-2); }
+
+          .todo-card.completed { opacity: 0.6; }
+          .todo-card.completed .todo-title { text-decoration: line-through; color: var(--muted); }
+
+          .todo-card.selected {
+            background: rgba(10, 132, 255, 0.1);
+            box-shadow: inset 0 0 0 1px var(--accent);
+          }
+
+          .select-dot, .check, .handle {
+            width: 1.5rem; height: 1.5rem;
+            display: grid; place-items: center;
+            border-radius: 50%;
+            box-shadow: inset 0 0 0 1px var(--muted);
+            background: transparent;
+            color: transparent;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+          }
+
+          .handle { cursor: grab; box-shadow: none; color: var(--muted-2); font-size: 1.2rem; }
+          .select-dot { cursor: pointer; border-radius: 4px; }
+
+          /* Reminders-style Checkbox */
+          .check { cursor: pointer; }
+          .check.checked {
+            background: var(--accent);
+            box-shadow: none;
+            color: #fff;
+          }
+          .select-dot.selected { background: var(--accent); box-shadow: none; color: #fff; }
+
+          .todo-main { display: grid; gap: 0.25rem; }
+          .todo-top { display: flex; align-items: center; justify-content: space-between; }
+
+          .todo-title {
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            outline: none;
+          }
+          .todo-title[contenteditable="true"] {
+            padding: 0.2rem 0.4rem;
+            background: var(--surface-3);
+            border-radius: 4px;
+          }
+
+          .todo-meta { display: flex; gap: 0.5rem; font-size: 0.75rem; color: var(--muted); align-items: center; }
+
+          .todo-actions { display: flex; gap: 0.25rem; opacity: 0; transition: opacity var(--speed); }
+          .todo-card:hover .todo-actions, .todo-card:focus-within .todo-actions { opacity: 1; }
+
+          .mini-btn { width: 1.8rem; height: 1.8rem; font-size: 0.85rem; }
+          .tag { padding: 0.15rem 0.4rem; font-size: 0.7rem; border-radius: 4px; }
+
+          /* Sidebar */
+          .section h3 { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+
+          .stack { display: grid; gap: 0.75rem; }
+
+          .metric {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--surface-2);
+            border-radius: var(--radius-md);
+            box-shadow: inset 0 0 0 1px var(--border);
+            font-size: 0.9rem;
+          }
+          .metric strong { font-weight: 600; display: block; margin-bottom: 0.1rem; }
+          .metric small { color: var(--muted); font-size: 0.75rem; }
+
+          .shortcut-grid { display: grid; gap: 0.5rem; }
+          .shortcut {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.6rem 0.8rem;
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            font-size: 0.85rem; color: var(--muted);
+          }
+
+          .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 1rem; min-height: 200px;
+            color: var(--muted);
+          }
+          .empty-state .emoji { font-size: 2.5rem; opacity: 0.5; }
+
+          .skeleton { position: relative; overflow: hidden; background: var(--surface-2); border-color: transparent; }
+          .skeleton::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 1.5s infinite;
+          }
+
+          .online-dot, .offline-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+          .online-dot { background: var(--success); box-shadow: 0 0 8px var(--success); }
+          .offline-dot { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+
+          /* Spotlight / Command Palette */
+          dialog {
+            width: min(640px, calc(100vw - 2rem));
+            margin: 10vh auto auto;
+            border: none;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            box-shadow: inset 0 0 0 1px var(--border), var(--shadow-lg);
+            backdrop-filter: blur(60px) saturate(200%);
+            -webkit-backdrop-filter: blur(60px) saturate(200%);
+            color: var(--text);
+            padding: 0;
+          }
+          dialog::backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+
+          .palette { display: flex; flex-direction: column; }
+          .palette-head { padding: 1rem; border-bottom: 1px solid var(--border); }
+          .palette-input { font-size: 1.2rem; background: transparent; box-shadow: none; padding: 0.5rem; }
+          .palette-input:focus { box-shadow: none; background: transparent; }
+
+          .palette-list {
+            max-height: 400px; overflow-y: auto;
+            padding: 0.5rem; display: grid; gap: 0.25rem;
+          }
+          .palette-result {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+            text-align: left; width: 100%; transition: background 0.1s;
+          }
+          .palette-result:hover, .palette-result:focus { background: var(--surface-3); outline: none; }
+          .palette-result strong { font-weight: 500; }
+          .palette-result small { color: var(--muted); margin-left: 0.5rem; }
+
+          /* Premium Toasts */
+          .toast-wrap { position: fixed; right: 2rem; bottom: 2rem; display: grid; gap: 0.75rem; z-index: 999; }
+          .toast {
+            width: 320px;
+            padding: 1rem;
+            background: var(--surface-2);
+            backdrop-filter: blur(20px);
+            box-shadow: inset 0 0 0 1px var(--border), var(--shadow-md);
+            border-radius: var(--radius-md);
+            animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+          }
+          .toast-head { display: flex; justify-content: space-between; align-items: flex-start; }
+          .toast strong { font-size: 0.9rem; font-weight: 600; }
+          .toast .muted { font-size: 0.85rem; margin-top: 0.2rem; }
+          .tiny-link { color: var(--accent); font-size: 0.85rem; font-weight: 500; margin-top: 0.5rem; padding: 0; }
+
+          .hidden { display: none !important; }
+
+          @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+          @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+          @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+          @media (max-width: 860px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .panel { border-right: none; border-bottom: 1px solid var(--border); }
+            .search-row { grid-template-columns: 1fr 1fr; }
+            .select { grid-column: 1 / -1; }
+          }
+        }
+
+        .row { display: flex; align-items: center; gap: 0.5rem; }
+        .nowrap { white-space: nowrap; }
+    </style>
+</head>
 <body>
+<main class="app" id="app">
+    <section class="shell">
+        <div class="topbar">
+            <div class="brand">
+                <div>
+                    <h1>Focus</h1>
+                    <p>Engineered for deep work.</p>
+                </div>
+            </div>
 
+            <div class="toolbar">
+                <div class="pill" id="connectionPill" data-state="online">
+                    <span class="online-dot" id="connectionDot" aria-hidden="true"></span>
+                    <span id="connectionText">Online</span>
+                </div>
+                <button class="ghost-btn" id="syncBtn" type="button" title="Sync now">↻ <span class="nowrap">Sync</span></button>
+                <button class="ghost-btn" id="themeBtn" type="button" title="Toggle theme"><span id="themeIcon">◐</span></button>
+                <button class="ghost-btn" id="paletteBtn" type="button" title="Command palette">⌘K</button>
+            </div>
+        </div>
 
+        <div class="hero-grid">
+            <section class="panel" aria-label="Todo workspace">
+                <div class="headline">
+                    <h2>Inbox</h2>
+                    <span class="badge" id="viewBadge">Live</span>
+                </div>
+                <div class="hero-copy">
+                    <p>Seamlessly organize your tasks. Synchronized across all your devices.</p>
+                </div>
 
-<input id="title" placeholder="Enter todo title">
-<button onclick="addTodo()">Add Todo</button>
+                <div class="metrics" aria-label="Summary metrics">
+                    <article class="stats-card"><span class="label">Total</span><span class="value" id="metricTotal">0</span></article>
+                    <article class="stats-card"><span class="label">Active</span><span class="value" id="metricActive">0</span></article>
+                    <article class="stats-card"><span class="label">Done</span><span class="value" id="metricDone">0</span></article>
+                    <article class="stats-card"><span class="label">Selected</span><span class="value" id="metricSelected">0</span></article>
+                </div>
 
-<ul id="todoList"></ul>
+                <div class="composer">
+                    <form id="addForm" autocomplete="off">
+                        <input class="input" id="titleInput" name="title" type="text" placeholder="I want to..." maxlength="140" aria-label="New task title" />
+                        <button class="action-btn" type="submit">Add</button>
+                        <button class="ghost-btn" id="focusSearchBtn" type="button">⌘F</button>
+                    </form>
 
-<script>
-    const API_URL = "http://localhost:8080/api/todos";
+                    <div class="search-row">
+                        <input class="search" id="searchInput" type="search" placeholder="Search tasks..." aria-label="Search todos" />
+                        <button class="chip active" data-filter="all" type="button">All</button>
+                        <button class="chip" data-filter="active" type="button">Active</button>
+                        <button class="chip" data-filter="completed" type="button">Done</button>
+                        <select class="select" id="sortSelect" aria-label="Sort todos">
+                            <option value="manual">Manual order</option>
+                            <option value="updated-desc">Recently updated</option>
+                            <option value="created-desc">Newest first</option>
+                            <option value="created-asc">Oldest first</option>
+                            <option value="alpha-asc">Title A → Z</option>
+                            <option value="alpha-desc">Title Z → A</option>
+                        </select>
+                    </div>
 
-    function loadTodos() {
-        fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById("todoList");
-                list.innerHTML = "";
-                data.forEach(todo => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `${todo.title}
-                        <button onclick="deleteTodo(${todo.id})">Delete</button>`;
-                    list.appendChild(li);
-                });
-            });
+                    <div class="bulk-bar" id="bulkBar">
+                        <div class="row"><strong id="bulkText">0 selected</strong></div>
+                        <div class="row">
+                            <button class="ghost-btn" id="bulkCompleteBtn" type="button">Mark Done</button>
+                            <button class="ghost-btn" id="bulkActiveBtn" type="button">Mark Active</button>
+                            <button class="ghost-btn" id="bulkDeleteBtn" type="button" style="color: var(--danger)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stack" style="margin-top: 1.5rem;">
+                    <div id="loadingSkeleton" class="stack hidden" aria-hidden="true">
+                        <div class="todo-card skeleton" style="height: 72px;"></div>
+                        <div class="todo-card skeleton" style="height: 72px;"></div>
+                        <div class="todo-card skeleton" style="height: 72px;"></div>
+                    </div>
+
+                    <ul class="todo-stack" id="todoList" aria-label="Todo list"></ul>
+
+                    <div class="empty-state hidden" id="emptyState">
+                        <div class="emoji">􀓜</div>
+                        <div>
+                            <h3 id="emptyTitle">All caught up</h3>
+                            <p id="emptyText">You have no tasks. Press Enter to create one.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <section class="section">
+                    <h3>Status</h3>
+                    <div class="stack">
+                        <div class="metric"><div><strong id="syncStatus">Ready</strong><small id="syncDetails">Local & Cloud</small></div></div>
+                        <div class="metric"><div><strong>Filter</strong><small id="viewStateText">All</small></div></div>
+                        <div class="metric"><div><strong>Storage</strong><small id="storageStateText">IndexedDB</small></div></div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h3>Quick Actions</h3>
+                    <div class="chips">
+                        <button class="filter-btn" data-quick="clear-completed" type="button">Clear completed</button>
+                        <button class="filter-btn" data-quick="select-all" type="button">Select all</button>
+                        <button class="filter-btn" data-quick="clear-selection" type="button">Deselect</button>
+                        <button class="filter-btn" data-quick="copy-summary" type="button">Copy state</button>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h3>Shortcuts</h3>
+                    <div class="shortcut-grid">
+                        <div class="shortcut"><span>New</span><span class="kbd">↵</span></div>
+                        <div class="shortcut"><span>Palette</span><span class="kbd">⌘ K</span></div>
+                        <div class="shortcut"><span>Search</span><span class="kbd">/</span></div>
+                        <div class="shortcut"><span>Theme</span><span class="kbd">T</span></div>
+                        <div class="shortcut"><span>Undo</span><span class="kbd">U</span></div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h3>Data Management</h3>
+                    <div class="chips">
+                        <button class="ghost-btn" id="exportJsonBtn" type="button">Export JSON</button>
+                        <button class="ghost-btn" id="exportCsvBtn" type="button">Export CSV</button>
+                        <button class="ghost-btn" id="importBtn" type="button">Import</button>
+                        <button class="ghost-btn" id="clearCompletedBtn" type="button" style="display:none">Clear</button>
+                    </div>
+                    <input class="hidden" id="importInput" type="file" accept="application/json,text/csv,.json,.csv" />
+                </section>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<dialog id="paletteDialog" aria-label="Command palette">
+    <div class="palette">
+        <div class="palette-head">
+            <input class="palette-input" id="paletteInput" type="search" placeholder="What do you want to do?" autocomplete="off" />
+            <button id="closePaletteBtn" class="hidden">Close</button>
+        </div>
+        <div class="palette-list" id="paletteList"></div>
+    </div>
+</dialog>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module">
+    // Fully Integrated API Path for Spring Boot
+    const API = "http://localhost:8080/api/todos";
+    const DB_NAME = "focus-db";
+    const DB_VERSION = 1;
+    const STORE = "todos";
+    const PREF_KEY = "focus-prefs";
+    const CHANNEL_NAME = "focus-channel";
+
+    const els = {
+      todoList: document.getElementById("todoList"),
+      emptyState: document.getElementById("emptyState"),
+      emptyTitle: document.getElementById("emptyTitle"),
+      emptyText: document.getElementById("emptyText"),
+      loadingSkeleton: document.getElementById("loadingSkeleton"),
+      addForm: document.getElementById("addForm"),
+      titleInput: document.getElementById("titleInput"),
+      searchInput: document.getElementById("searchInput"),
+      sortSelect: document.getElementById("sortSelect"),
+      filterButtons: [...document.querySelectorAll("[data-filter]")],
+      quickButtons: [...document.querySelectorAll("[data-quick]")],
+      bulkBar: document.getElementById("bulkBar"),
+      bulkText: document.getElementById("bulkText"),
+      bulkCompleteBtn: document.getElementById("bulkCompleteBtn"),
+      bulkActiveBtn: document.getElementById("bulkActiveBtn"),
+      bulkDeleteBtn: document.getElementById("bulkDeleteBtn"),
+      metricTotal: document.getElementById("metricTotal"),
+      metricActive: document.getElementById("metricActive"),
+      metricDone: document.getElementById("metricDone"),
+      metricSelected: document.getElementById("metricSelected"),
+      syncStatus: document.getElementById("syncStatus"),
+      syncDetails: document.getElementById("syncDetails"),
+      viewStateText: document.getElementById("viewStateText"),
+      storageStateText: document.getElementById("storageStateText"),
+      connectionPill: document.getElementById("connectionPill"),
+      connectionDot: document.getElementById("connectionDot"),
+      connectionText: document.getElementById("connectionText"),
+      themeBtn: document.getElementById("themeBtn"),
+      themeIcon: document.getElementById("themeIcon"),
+      syncBtn: document.getElementById("syncBtn"),
+      paletteBtn: document.getElementById("paletteBtn"),
+      focusSearchBtn: document.getElementById("focusSearchBtn"),
+      exportJsonBtn: document.getElementById("exportJsonBtn"),
+      exportCsvBtn: document.getElementById("exportCsvBtn"),
+      importBtn: document.getElementById("importBtn"),
+      importInput: document.getElementById("importInput"),
+      clearCompletedBtn: document.getElementById("clearCompletedBtn"),
+      paletteDialog: document.getElementById("paletteDialog"),
+      paletteInput: document.getElementById("paletteInput"),
+      paletteList: document.getElementById("paletteList"),
+      closePaletteBtn: document.getElementById("closePaletteBtn"),
+      toastWrap: document.getElementById("toastWrap"),
+      viewBadge: document.getElementById("viewBadge"),
+    };
+
+    const state = {
+      todos: [],
+      selected: new Set(),
+      filter: "all",
+      query: "",
+      sort: "manual",
+      theme: "dark",
+      loading: true,
+      syncing: false,
+      online: navigator.onLine,
+      dragId: null,
+      undoStack: [],
+      pendingRender: false,
+    };
+
+    const commands = [
+      { id: "new", title: "Create new task", hint: "Focus add field", run: () => els.titleInput.focus() },
+      { id: "search", title: "Focus search", hint: "Jump to search", run: () => els.searchInput.focus() },
+      { id: "theme", title: "Toggle theme", hint: "Dark / light", run: toggleTheme },
+      { id: "all", title: "Show all", hint: "Remove filter", run: () => setFilter("all") },
+      { id: "active", title: "Show active", hint: "Open tasks only", run: () => setFilter("active") },
+      { id: "completed", title: "Show completed", hint: "Done tasks only", run: () => setFilter("completed") },
+      { id: "sort-updated", title: "Sort by updated", hint: "Recently changed", run: () => setSort("updated-desc") },
+      { id: "clear-completed", title: "Clear completed", hint: "Deletes done tasks", run: clearCompleted },
+      { id: "select-all", title: "Select visible", hint: "Bulk actions", run: selectAllVisible },
+      { id: "clear-selection", title: "Clear selection", hint: "Reset selected", run: clearSelection },
+      { id: "copy-summary", title: "Copy summary", hint: "Clipboard", run: copySummary },
+      { id: "share", title: "Share summary", hint: "Web Share API", run: shareSummary },
+      { id: "sync", title: "Sync now", hint: "Backend refresh", run: syncFromServer },
+      { id: "export-json", title: "Export JSON", hint: "File export", run: () => exportTodos("json") },
+      { id: "export-csv", title: "Export CSV", hint: "File export", run: () => exportTodos("csv") },
+      { id: "undo", title: "Undo delete", hint: "Restore last removed", run: undoDelete },
+    ];
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canViewTransition = "startViewTransition" in document && !prefersReducedMotion;
+    const canBroadcast = "BroadcastChannel" in window;
+    const channel = canBroadcast ? new BroadcastChannel(CHANNEL_NAME) : null;
+    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+
+    let dbPromise = null;
+    let observer = null;
+    let syncAbort = null;
+
+    init();
+
+    async function init() {
+      hydratePrefs();
+      applyTheme(state.theme, false);
+      bindEvents();
+      updateConnection();
+      initUrlState();
+      await maybePersistStorage();
+      dbPromise = openDb();
+      await hydrateFromCache();
+      scheduleRender();
+      await syncFromServer({ silent: true });
+      setupPalette();
+      updatePaletteList();
+      updateViewBadge();
     }
 
-    function addTodo() {
-        const title = document.getElementById("title").value;
+    function bindEvents() {
+      els.addForm.addEventListener("submit", onAddTask);
+      els.searchInput.addEventListener("input", onSearch);
+      els.sortSelect.addEventListener("change", onSortChange);
+      els.filterButtons.forEach(btn => btn.addEventListener("click", () => setFilter(btn.dataset.filter)));
+      els.quickButtons.forEach(btn => btn.addEventListener("click", () => runQuickAction(btn.dataset.quick)));
+      els.bulkCompleteBtn.addEventListener("click", () => bulkSetCompleted(true));
+      els.bulkActiveBtn.addEventListener("click", () => bulkSetCompleted(false));
+      els.bulkDeleteBtn.addEventListener("click", bulkDeleteSelected);
+      els.themeBtn.addEventListener("click", toggleTheme);
+      els.syncBtn.addEventListener("click", () => syncFromServer());
+      els.paletteBtn.addEventListener("click", openPalette);
+      els.focusSearchBtn.addEventListener("click", () => els.searchInput.focus());
+      els.exportJsonBtn.addEventListener("click", () => exportTodos("json"));
+      els.exportCsvBtn.addEventListener("click", () => exportTodos("csv"));
+      els.importBtn.addEventListener("click", () => els.importInput.click());
+      els.importInput.addEventListener("change", onImportFile);
+      els.clearCompletedBtn.addEventListener("click", clearCompleted);
+      els.closePaletteBtn.addEventListener("click", closePalette);
+      els.paletteInput.addEventListener("input", updatePaletteList);
+      els.paletteList.addEventListener("click", onPaletteClick);
+      window.addEventListener("keydown", onGlobalKeydown, { passive: false });
+      window.addEventListener("online", () => { state.online = true; updateConnection(); syncFromServer({ silent: true }); });
+      window.addEventListener("offline", () => { state.online = false; updateConnection(); renderStatus("Offline", "Local cache only"); });
+      window.addEventListener("popstate", initUrlState);
+      channel?.addEventListener("message", onChannelMessage);
 
-        fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                title: title,
-                completed: false
-            })
-        }).then(() => {
-            document.getElementById("title").value = "";
-            loadTodos();
+      els.paletteDialog.addEventListener("click", e => {
+        if (e.target === els.paletteDialog) closePalette();
+      });
+    }
+
+    function hydratePrefs() {
+      try {
+        const prefs = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+        state.theme = prefs.theme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        state.filter = prefs.filter || "all";
+        state.query = prefs.query || "";
+        state.sort = prefs.sort || "manual";
+      } catch {
+        state.theme = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+    }
+
+    function savePrefs() {
+      localStorage.setItem(PREF_KEY, JSON.stringify({ theme: state.theme, filter: state.filter, query: state.query, sort: state.sort }));
+    }
+
+    async function maybePersistStorage() {
+      try {
+        const persisted = await navigator.storage?.persist?.();
+        els.storageStateText.textContent = persisted ? "Persistent" : "IndexedDB";
+      } catch {
+        els.storageStateText.textContent = "IndexedDB";
+      }
+    }
+
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(STORE)) {
+            const store = db.createObjectStore(STORE, { keyPath: "id" });
+            store.createIndex("rank", "rank", { unique: false });
+            store.createIndex("title", "title", { unique: false });
+            store.createIndex("completed", "completed", { unique: false });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function tx(mode = "readonly") {
+      return dbPromise.then(db => db.transaction(STORE, mode).objectStore(STORE));
+    }
+
+    function promisify(request) {
+      return new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbGetAll() { return promisify((await tx("readonly")).getAll()); }
+    async function idbPut(todo) { return promisify((await tx("readwrite")).put(todo)); }
+    async function idbDelete(id) { return promisify((await tx("readwrite")).delete(id)); }
+    async function idbPutMany(todos) { const store = await tx("readwrite"); await Promise.all(todos.map(todo => promisify(store.put(todo)))); }
+
+    async function hydrateFromCache() {
+      const cached = await idbGetAll();
+      state.todos = normalizeList(cached);
+      state.loading = false;
+      render();
+      els.syncDetails.textContent = cached.length ? "Loaded from device" : "Waiting for backend";
+    }
+
+    function normalizeList(list) {
+      return [...(list || [])].map((todo, index) => normalizeTodo(todo, { rank: index + 1 })).sort(byRank);
+    }
+
+    function normalizeTodo(todo, fallback = {}) {
+      const now = new Date().toISOString();
+      return {
+        id: String(todo?.id ?? crypto.randomUUID()),
+        title: String(todo?.title ?? fallback.title ?? "Untitled task"),
+        completed: Boolean(todo?.completed ?? fallback.completed ?? false),
+        rank: Number.isFinite(todo?.rank) ? todo.rank : (fallback.rank ?? nextRank()),
+        createdAt: todo?.createdAt || fallback.createdAt || now,
+        updatedAt: todo?.updatedAt || fallback.updatedAt || now,
+      };
+    }
+
+    function nextRank() {
+      return state.todos.reduce((max, todo) => Math.max(max, Number(todo.rank) || 0), 0) + 1;
+    }
+
+    function byRank(a, b) { return (Number(a.rank) || 0) - (Number(b.rank) || 0); }
+    function byUpdatedDesc(a, b) { return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0) || byRank(a, b); }
+    function byCreatedDesc(a, b) { return new Date(b.createdAt || 0) - new Date(a.createdAt || 0) || byRank(a, b); }
+    function byCreatedAsc(a, b) { return new Date(a.createdAt || 0) - new Date(b.createdAt || 0) || byRank(a, b); }
+    function byTitleAsc(a, b) { return a.title.localeCompare(b.title); }
+    function byTitleDesc(a, b) { return b.title.localeCompare(a.title); }
+
+    function applyFilterSort(list) {
+      const q = state.query.trim().toLowerCase();
+      let result = list.filter(todo => {
+        const matchesFilter = state.filter === "all" || (state.filter === "active" ? !todo.completed : todo.completed);
+        const matchesQuery = !q || `${todo.title} ${todo.completed ? "completed" : "active"} ${todo.id}`.toLowerCase().includes(q);
+        return matchesFilter && matchesQuery;
+      });
+      switch (state.sort) {
+        case "updated-desc": result = result.sort(byUpdatedDesc); break;
+        case "created-desc": result = result.sort(byCreatedDesc); break;
+        case "created-asc": result = result.sort(byCreatedAsc); break;
+        case "alpha-asc": result = result.sort(byTitleAsc); break;
+        case "alpha-desc": result = result.sort(byTitleDesc); break;
+        default: result = result.sort(byRank);
+      }
+      return result;
+    }
+
+    function scheduleRender() {
+      if (state.pendingRender) return;
+      state.pendingRender = true;
+      requestAnimationFrame(() => {
+        state.pendingRender = false;
+        render();
+      });
+    }
+
+    function render() {
+      const list = applyFilterSort(state.todos);
+      const total = state.todos.length;
+      const active = state.todos.filter(t => !t.completed).length;
+      const done = total - active;
+      const selected = state.selected.size;
+
+      els.metricTotal.textContent = String(total);
+      els.metricActive.textContent = String(active);
+      els.metricDone.textContent = String(done);
+      els.metricSelected.textContent = String(selected);
+      els.bulkText.textContent = `${selected} selected`;
+      els.bulkBar.classList.toggle("show", selected > 0);
+      els.viewStateText.textContent = `${capitalize(state.filter)} · ${sortLabel(state.sort)}`;
+      els.viewBadge.textContent = state.syncing ? "Syncing" : state.online ? "Live" : "Offline";
+      els.searchInput.value = state.query;
+      els.sortSelect.value = state.sort;
+      updateFilterButtons();
+      updateConnection();
+
+      els.loadingSkeleton.classList.toggle("hidden", !state.loading);
+      const empty = !state.loading && list.length === 0;
+      els.emptyState.classList.toggle("hidden", !empty);
+      els.todoList.innerHTML = "";
+
+      if (empty) {
+        els.emptyTitle.textContent = state.todos.length === 0 ? "All caught up" : "Nothing found";
+        els.emptyText.textContent = state.todos.length === 0 ? "You have no tasks. Press Enter to create one." : "Try clearing the search or switching to All.";
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+      list.forEach((todo, index) => frag.appendChild(renderTodo(todo, index)));
+      els.todoList.appendChild(frag);
+      updateObserver();
+    }
+
+    function renderTodo(todo) {
+      const li = document.createElement("li");
+      li.className = "todo-card" + (todo.completed ? " completed" : "");
+      li.dataset.id = todo.id;
+      li.draggable = true;
+      li.tabIndex = 0;
+      if (state.selected.has(todo.id)) li.classList.add("selected");
+
+      const selected = state.selected.has(todo.id);
+      li.innerHTML = `
+        <button class="select-dot ${selected ? 'selected' : ''}" type="button" aria-label="${selected ? 'Deselect' : 'Select'} task">${selected ? '✓' : ''}</button>
+        <button class="handle" type="button" aria-label="Drag task">≡</button>
+        <button class="check ${todo.completed ? 'checked' : ''}" type="button" aria-label="${todo.completed ? 'Mark as active' : 'Mark as done'}">${todo.completed ? '✓' : ''}</button>
+        <div class="todo-main">
+          <div class="todo-top">
+            <span class="todo-title" contenteditable="false" spellcheck="false"></span>
+            <div class="todo-actions">
+              <button class="mini-btn" type="button" aria-label="Edit">✎</button>
+              <button class="mini-btn" type="button" aria-label="Delete">✕</button>
+            </div>
+          </div>
+          <div class="todo-meta">
+            <span>${relativeTime(todo.updatedAt)}</span>
+          </div>
+        </div>
+      `;
+
+      const titleEl = li.querySelector(".todo-title");
+      titleEl.textContent = todo.title;
+      const [selectBtn, handleBtn, checkBtn, editBtn, deleteBtn] = [
+        li.querySelector(".select-dot"),
+        li.querySelector(".handle"),
+        li.querySelector(".check"),
+        li.querySelectorAll(".mini-btn")[0],
+        li.querySelectorAll(".mini-btn")[1],
+      ];
+
+      selectBtn.addEventListener("click", () => toggleSelected(todo.id));
+      handleBtn.addEventListener("pointerdown", () => (state.dragId = todo.id));
+      checkBtn.addEventListener("click", () => toggleTodo(todo.id));
+      editBtn.addEventListener("click", () => startInlineEdit(titleEl, todo.id));
+      deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
+      titleEl.addEventListener("dblclick", () => startInlineEdit(titleEl, todo.id));
+
+      li.addEventListener("keydown", e => {
+        if (e.key === "Enter" && e.target === li) { e.preventDefault(); startInlineEdit(titleEl, todo.id); }
+        if ((e.key === " " || e.key === "Spacebar") && e.target === li) { e.preventDefault(); toggleSelected(todo.id); }
+        if (e.key.toLowerCase() === "d" && e.target === li) { e.preventDefault(); toggleTodo(todo.id); }
+      });
+
+      li.addEventListener("click", e => {
+        if (e.metaKey || e.ctrlKey) toggleSelected(todo.id);
+      });
+
+      li.addEventListener("dragstart", e => {
+        state.dragId = todo.id;
+        li.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", todo.id);
+      });
+      li.addEventListener("dragend", () => {
+        state.dragId = null;
+        li.classList.remove("dragging");
+      });
+      li.addEventListener("dragover", e => e.preventDefault());
+      li.addEventListener("drop", async e => {
+        e.preventDefault();
+        const draggedId = state.dragId || e.dataTransfer.getData("text/plain");
+        if (!draggedId || draggedId === todo.id) return;
+        await reorderTodo(draggedId, todo.id);
+      });
+
+      return li;
+    }
+
+    function updateObserver() {
+      observer?.disconnect();
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add("is-visible");
         });
+      }, { threshold: 0.1, rootMargin: "50px 0px" });
+      [...els.todoList.children].forEach(child => observer.observe(child));
     }
 
-    function deleteTodo(id) {
-        fetch(API_URL + "/" + id, {
-            method: "DELETE"
-        }).then(() => loadTodos());
+    function updateFilterButtons() {
+      document.querySelectorAll("[data-filter]").forEach(btn => btn.classList.toggle("active", btn.dataset.filter === state.filter));
     }
 
-    loadTodos();
+    function updateConnection() {
+      els.connectionDot.className = state.online ? "online-dot" : "offline-dot";
+      els.connectionText.textContent = state.syncing ? "Syncing" : state.online ? "Online" : "Offline";
+      els.syncStatus.textContent = state.syncing ? "Syncing" : state.online ? "Ready" : "Offline";
+      els.syncDetails.textContent = state.syncing ? "Updating securely" : state.online ? "Local & Cloud" : "Local only";
+      els.connectionPill.dataset.state = state.syncing ? "syncing" : state.online ? "online" : "offline";
+    }
+
+    function renderStatus(title, detail) {
+      els.syncStatus.textContent = title;
+      els.syncDetails.textContent = detail;
+    }
+
+    function updateViewBadge() {
+      els.viewBadge.textContent = state.syncing ? "Syncing" : state.online ? "Live" : "Offline";
+    }
+
+    function setFilter(filter) {
+      if (state.filter === filter) return;
+      mutate(() => {
+        state.filter = filter;
+        savePrefs();
+        pushUrlState();
+        scheduleRender();
+        updatePaletteList();
+      });
+    }
+
+    function setSort(sort) {
+      mutate(() => {
+        state.sort = sort;
+        savePrefs();
+        pushUrlState();
+        scheduleRender();
+      });
+    }
+
+    function onSearch() {
+      state.query = els.searchInput.value;
+      savePrefs();
+      pushUrlState();
+      scheduleRender();
+    }
+
+    function onSortChange() { setSort(els.sortSelect.value); }
+
+    async function onAddTask(event) {
+      event.preventDefault();
+      const title = els.titleInput.value.trim();
+      if (!title) return;
+
+      // Match Spring Boot Validation (@Size(min = 3, max = 100))
+      if (title.length < 3 || title.length > 100) {
+        toast("Validation Error", "Title must be between 3 and 100 characters.", "danger");
+        return;
+      }
+
+      els.titleInput.value = "";
+      try {
+        renderStatus("Saving", "Posting...");
+        const created = await apiJson(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, completed: false }),
+        });
+        const todo = normalizeTodo(created, { rank: nextRank() });
+        state.todos = [...state.todos, todo].sort(byRank);
+        await idbPut(todo);
+        broadcast({ type: "upsert", todo });
+        scheduleRender();
+        toast("Task added", title, "success", { label: "Undo", onAction: () => deleteById(todo.id, true) });
+        renderStatus("Saved", "Synced across devices");
+      } catch (error) {
+        console.error(error);
+        toast("Offline Save", "Saved locally. Will sync later.", "warning");
+        renderStatus("Local Save", "Pending network");
+      }
+    }
+
+    async function toggleTodo(id) {
+      const todo = findTodo(id);
+      if (!todo) return;
+      await patchTodo(id, { title: todo.title, completed: !todo.completed }, todo.completed ? "marked active" : "marked done");
+    }
+
+    async function patchTodo(id, patch, toastLabel = "updated") {
+      const current = findTodo(id);
+      if (!current) return;
+      try {
+        renderStatus("Saving", "Updating...");
+        const updated = await apiJson(`${API}/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: patch.title ?? current.title, completed: patch.completed ?? current.completed }),
+        });
+        const merged = normalizeTodo(updated, { ...current, ...patch, updatedAt: new Date().toISOString() });
+        merged.rank = current.rank;
+        replaceTodo(merged);
+        await idbPut(merged);
+        broadcast({ type: "upsert", todo: merged });
+        scheduleRender();
+        toast(`Task ${toastLabel}`, merged.title, "success");
+        renderStatus("Saved", "Changes synchronized");
+      } catch (error) {
+        console.error(error);
+        toast("Local Update", "Change queued locally.", "warning");
+        renderStatus("Local Update", "Pending sync");
+      }
+    }
+
+    async function deleteTodo(id, quiet = false) {
+      const todo = findTodo(id);
+      if (!todo) return;
+      state.undoStack.push(structuredClone(todo));
+      if (state.undoStack.length > 8) state.undoStack.shift();
+      await deleteById(id, quiet);
+    }
+
+    async function deleteById(id, quiet = false) {
+      const todo = findTodo(id);
+      if (!todo) return;
+      try {
+        renderStatus("Deleting", "...");
+        await apiJson(`${API}/${id}`, { method: "DELETE" });
+        state.todos = state.todos.filter(t => String(t.id) !== String(id));
+        state.selected.delete(String(id));
+        await idbDelete(String(id));
+        broadcast({ type: "delete", id: String(id) });
+        scheduleRender();
+        if (!quiet) toast("Task deleted", todo.title, "success", { label: "Undo", onAction: undoDelete });
+        renderStatus("Deleted", "Removed globally");
+      } catch (error) {
+        console.error(error);
+        toast("Local Delete", "Removed. Will sync deletion later.", "warning");
+      }
+    }
+
+    async function undoDelete() {
+      const todo = state.undoStack.pop();
+      if (!todo) return toast("Nothing to undo", "No recent delete found", "danger");
+      try {
+        const restored = await apiJson(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: todo.title, completed: todo.completed }),
+        });
+        const mapped = normalizeTodo(restored, { ...todo, rank: nextRank() });
+        state.todos = [...state.todos, mapped].sort(byRank);
+        await idbPut(mapped);
+        broadcast({ type: "upsert", todo: mapped });
+        scheduleRender();
+        toast("Undo complete", mapped.title, "success");
+      } catch (error) {
+        console.error(error);
+        toast("Undo queued", "Network offline", "warning");
+      }
+    }
+
+    async function reorderTodo(sourceId, targetId) {
+      if (sourceId === targetId) return;
+      const list = [...state.todos].sort(byRank);
+      const from = list.findIndex(t => t.id === String(sourceId));
+      const to = list.findIndex(t => t.id === String(targetId));
+      if (from < 0 || to < 0) return;
+      const [moved] = list.splice(from, 1);
+      list.splice(to, 0, moved);
+      list.forEach((todo, index) => todo.rank = index + 1);
+      state.todos = list;
+      await idbPutMany(list);
+      broadcast({ type: "bulk", todos: list });
+      scheduleRender();
+    }
+
+    function startInlineEdit(titleEl, id) {
+      const todo = findTodo(id);
+      if (!todo) return;
+      titleEl.contentEditable = "true";
+      titleEl.focus();
+      selectNodeText(titleEl);
+
+      const save = async (shouldSave) => {
+        titleEl.contentEditable = "false";
+        titleEl.removeEventListener("keydown", keyHandler);
+        if (!shouldSave) {
+          titleEl.textContent = todo.title;
+          return;
+        }
+        const newTitle = titleEl.textContent.trim();
+        if (!newTitle || newTitle === todo.title) {
+          titleEl.textContent = todo.title;
+          return;
+        }
+        if (newTitle.length < 3 || newTitle.length > 100) {
+            toast("Validation Error", "Title must be between 3 and 100 characters.", "danger");
+            titleEl.textContent = todo.title;
+            return;
+        }
+        await patchTodo(id, { title: newTitle }, "renamed");
+      };
+
+      const keyHandler = e => {
+        if (e.key === "Enter") { e.preventDefault(); titleEl.blur(); }
+        if (e.key === "Escape") { e.preventDefault(); titleEl.textContent = todo.title; save(false); }
+      };
+
+      titleEl.addEventListener("keydown", keyHandler);
+      titleEl.addEventListener("blur", () => save(true), { once: true });
+    }
+
+    function selectNodeText(node) {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    function toggleSelected(id) {
+      const key = String(id);
+      if (state.selected.has(key)) state.selected.delete(key);
+      else state.selected.add(key);
+      scheduleRender();
+    }
+
+    function clearSelection() {
+      state.selected.clear();
+      scheduleRender();
+    }
+
+    function selectAllVisible() {
+      applyFilterSort(state.todos).forEach(todo => state.selected.add(todo.id));
+      scheduleRender();
+    }
+
+    async function bulkSetCompleted(completed) {
+      const ids = [...state.selected];
+      if (!ids.length) return;
+      await Promise.all(ids.map(id => {
+        const todo = findTodo(id);
+        if (!todo) return Promise.resolve();
+        return patchTodo(id, { title: todo.title, completed }, completed ? "marked done" : "marked active");
+      }));
+      clearSelection();
+    }
+
+    async function bulkDeleteSelected() {
+      const ids = [...state.selected];
+      if (!ids.length) return;
+      await Promise.all(ids.map(id => deleteById(id, true)));
+      clearSelection();
+      toast("Deleted", `${ids.length} tasks removed`, "success", { label: "Undo", onAction: undoDelete });
+    }
+
+    async function clearCompleted() {
+      const completed = state.todos.filter(t => t.completed);
+      if (!completed.length) return toast("All clean", "No completed tasks to clear", "success");
+      await Promise.all(completed.map(t => deleteById(t.id, true)));
+      toast("Cleaned up", `${completed.length} tasks cleared`, "success", { label: "Undo", onAction: undoDelete });
+    }
+
+    async function syncFromServer({ silent = false } = {}) {
+      if (!navigator.onLine) {
+        state.online = false;
+        updateConnection();
+        return;
+      }
+      if (syncAbort) syncAbort.abort();
+      syncAbort = new AbortController();
+      state.syncing = true;
+      updateConnection();
+      updateViewBadge();
+      try {
+        renderStatus("Syncing", "Connecting to backend...");
+        const remote = await apiJson(API, { signal: syncAbort.signal });
+        const merged = mergeServerTodos(remote);
+        state.todos = merged;
+        await idbPutMany(merged);
+        broadcast({ type: "bulk", todos: merged });
+        state.loading = false;
+        scheduleRender();
+        renderStatus("Synchronized", "Up to date");
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error(error);
+          renderStatus("Offline", "Working from local store");
+        }
+      } finally {
+        state.syncing = false;
+        updateConnection();
+        updateViewBadge();
+      }
+    }
+
+    function mergeServerTodos(remote) {
+      const localById = new Map(state.todos.map(t => [String(t.id), t]));
+      let next = state.todos.reduce((max, t) => Math.max(max, Number(t.rank) || 0), 0) + 1;
+      return (remote || []).map(r => {
+        const existing = localById.get(String(r.id));
+        if (existing) {
+          return { ...existing, ...normalizeTodo(r, existing), rank: existing.rank };
+        }
+        return normalizeTodo(r, { rank: next++, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+      }).sort(byRank);
+    }
+
+    async function apiJson(url, options = {}) {
+      const timeout = options.timeout ?? 12000;
+      const controller = options.signal ? null : new AbortController();
+      const signal = options.signal || controller.signal;
+      const timer = options.signal ? null : setTimeout(() => controller?.abort(), timeout);
+      try {
+        const res = await fetch(url, {
+          ...options,
+          signal,
+          headers: { Accept: "application/json", ...(options.headers || {}) },
+        });
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          throw new Error(text || `HTTP ${res.status}`);
+        }
+        if (res.status === 204) return null;
+        return await res.json();
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    }
+
+    function findTodo(id) { return state.todos.find(t => String(t.id) === String(id)); }
+    function replaceTodo(next) { state.todos = state.todos.map(t => String(t.id) === String(next.id) ? next : t).sort(byRank); }
+
+    function mutate(fn) {
+      if (canViewTransition) document.startViewTransition(() => fn());
+      else fn();
+    }
+
+    function toggleTheme() {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      applyTheme(state.theme, true);
+      savePrefs();
+    }
+
+    function applyTheme(theme, animate = true) {
+      document.documentElement.dataset.theme = theme;
+      els.themeIcon.textContent = theme === "dark" ? "◐" : "◑";
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", theme === "dark" ? "#000000" : "#ffffff");
+      if (!animate || prefersReducedMotion) return;
+      document.documentElement.animate([{ filter: "blur(4px)" }, { filter: "blur(0)" }], { duration: 250, easing: "ease-out" });
+    }
+
+    function openPalette() {
+      if (!els.paletteDialog.open) {
+        els.paletteDialog.showModal();
+        els.paletteInput.value = "";
+        updatePaletteList();
+        queueMicrotask(() => els.paletteInput.focus());
+      }
+    }
+
+    function closePalette() {
+      if (els.paletteDialog.open) els.paletteDialog.close();
+    }
+
+    function setupPalette() {
+      els.paletteDialog.addEventListener("close", () => { els.paletteInput.value = ""; });
+    }
+
+    function updatePaletteList() {
+      const q = els.paletteInput.value.trim().toLowerCase();
+      const filtered = commands.filter(cmd => !q || cmd.title.toLowerCase().includes(q) || cmd.hint.toLowerCase().includes(q));
+      els.paletteList.innerHTML = filtered.map(cmd => `
+        <button class="palette-result" type="button" data-command="${cmd.id}">
+          <div>
+            <strong>${escapeHtml(cmd.title)}</strong>
+            <small>${escapeHtml(cmd.hint)}</small>
+          </div>
+          <span class="kbd">↵</span>
+        </button>
+      `).join("");
+    }
+
+    function onPaletteClick(event) {
+      const btn = event.target.closest("[data-command]");
+      if (!btn) return;
+      const cmd = commands.find(c => c.id === btn.dataset.command);
+      if (!cmd) return;
+      cmd.run();
+      closePalette();
+    }
+
+    function runQuickAction(action) {
+      switch (action) {
+        case "clear-completed": return clearCompleted();
+        case "select-all": return selectAllVisible();
+        case "clear-selection": return clearSelection();
+        case "copy-summary": return copySummary();
+        case "share": return shareSummary();
+      }
+    }
+
+    async function copySummary() {
+      const summary = buildSummary();
+      try {
+        await navigator.clipboard.writeText(summary);
+        toast("Copied", "Summary saved to clipboard", "success");
+      } catch {
+        toast("Error", "Clipboard unavailable", "danger");
+      }
+    }
+
+    async function shareSummary() {
+      const text = buildSummary();
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Focus Summary", text });
+          return;
+        } catch {}
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("Copied", "Copied to clipboard instead", "success");
+      } catch {
+        toast("Error", "Sharing unavailable", "danger");
+      }
+    }
+
+    function buildSummary() {
+      const total = state.todos.length;
+      const active = state.todos.filter(t => !t.completed).length;
+      const done = total - active;
+      const lines = [
+        `Focus Summary`,
+        `Total: ${total} | Active: ${active} | Done: ${done}`,
+        "",
+        ...applyFilterSort(state.todos).map((todo, index) => `${index + 1}. [${todo.completed ? "x" : " "}] ${todo.title}`)
+      ];
+      return lines.join("\n");
+    }
+
+    async function exportTodos(format) {
+      const data = format === "csv" ? todosToCsv(state.todos) : JSON.stringify(state.todos, null, 2);
+      const mime = format === "csv" ? "text/csv" : "application/json";
+      const filename = `focus-export.${format}`;
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{ description: format.toUpperCase(), accept: { [mime]: [`.${format}`] } }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(data);
+          await writable.close();
+          toast("Exported", `${filename} saved`, "success");
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+      downloadText(filename, data, mime);
+      toast("Exported", `${filename} downloaded`, "success");
+    }
+
+    function todosToCsv(list) {
+      const rows = ["id,title,completed,rank,createdAt,updatedAt"];
+      for (const t of list) {
+        rows.push([
+          csv(t.id), csv(t.title), csv(String(t.completed)), csv(String(t.rank || "")), csv(t.createdAt || ""), csv(t.updatedAt || "")
+        ].join(","));
+      }
+      return rows.join("\n");
+    }
+
+    function csv(value) {
+      const s = String(value ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    function downloadText(filename, text, mime) {
+      const blob = new Blob([text], { type: `${mime};charset=utf-8` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+
+    async function onImportFile() {
+      const file = els.importInput.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        let imported = [];
+        if (file.name.toLowerCase().endsWith(".csv")) imported = parseCsv(text);
+        else imported = JSON.parse(text);
+        const normalized = normalizeList(imported).map(todo => ({ ...todo, rank: todo.rank || nextRank() }));
+        await idbPutMany(normalized);
+        state.todos = normalized;
+        await syncImportedToBackend(normalized);
+        broadcast({ type: "bulk", todos: normalized });
+        scheduleRender();
+        toast("Imported", `${normalized.length} tasks loaded`, "success");
+      } catch (error) {
+        console.error(error);
+        toast("Import failed", "Check your file format", "danger");
+      } finally {
+        els.importInput.value = "";
+      }
+    }
+
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const header = lines.shift();
+      const cols = header.split(",");
+      return lines.map(line => {
+        const values = parseCsvLine(line);
+        const obj = {};
+        cols.forEach((col, i) => obj[col.trim()] = values[i]);
+        obj.completed = obj.completed === "true";
+        obj.rank = Number(obj.rank || 0);
+        return obj;
+      });
+    }
+
+    function parseCsvLine(line) {
+      const out = [];
+      let cur = "";
+      let quote = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        const next = line[i + 1];
+        if (ch === '"' && quote && next === '"') { cur += '"'; i++; continue; }
+        if (ch === '"') { quote = !quote; continue; }
+        if (ch === ',' && !quote) { out.push(cur); cur = ""; continue; }
+        cur += ch;
+      }
+      out.push(cur);
+      return out;
+    }
+
+    async function syncImportedToBackend(list) {
+      await Promise.all(list.map(async todo => {
+        try {
+          if (findTodo(todo.id)) await patchTodo(todo.id, { title: todo.title, completed: todo.completed }, "updated");
+          else await apiJson(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: todo.title, completed: todo.completed }) });
+        } catch (error) {
+          console.error(error);
+        }
+      }));
+      await syncFromServer({ silent: true });
+    }
+
+    function toast(title, message, kind = "success", action = null) {
+      const node = document.createElement("div");
+      node.className = "toast";
+      node.dataset.kind = kind;
+      node.innerHTML = `
+        <div class="toast-head">
+          <div>
+            <strong>${escapeHtml(title)}</strong>
+            <div class="muted">${escapeHtml(message)}</div>
+          </div>
+          <button class="mini-btn" type="button" aria-label="Dismiss">✕</button>
+        </div>
+        <div class="toast-actions"></div>
+      `;
+      node.querySelector("button").addEventListener("click", () => removeToast(node));
+      if (action?.label) {
+        const btn = document.createElement("button");
+        btn.className = "tiny-link";
+        btn.type = "button";
+        btn.textContent = action.label;
+        btn.addEventListener("click", async () => {
+          await action.onAction?.();
+          removeToast(node);
+        });
+        node.querySelector(".toast-actions").appendChild(btn);
+      }
+      els.toastWrap.appendChild(node);
+      setTimeout(() => removeToast(node), 4000);
+    }
+
+    function removeToast(node) {
+      if (!node?.isConnected) return;
+      node.animate([{ opacity: 1, transform: "translateY(0) scale(1)" }, { opacity: 0, transform: "translateY(10px) scale(0.95)" }], { duration: 200, easing: "ease-in" }).onfinish = () => node.remove();
+    }
+
+    function onGlobalKeydown(event) {
+      const isCmd = event.metaKey || event.ctrlKey;
+      const k = event.key.toLowerCase();
+      if (isCmd && k === "k") { event.preventDefault(); openPalette(); return; }
+      if (isCmd && k === "f" && !els.paletteDialog.open) { event.preventDefault(); els.searchInput.focus(); return; }
+      if (k === "/" && !event.target.matches("input, textarea, [contenteditable='true']")) { event.preventDefault(); els.searchInput.focus(); return; }
+      if (k === "escape") { if (els.paletteDialog.open) closePalette(); else clearSelection(); return; }
+      if (k === "t" && !event.target.matches("input, textarea, [contenteditable='true']")) { toggleTheme(); return; }
+      if (k === "u" && !event.target.matches("input, textarea, [contenteditable='true']")) { undoDelete(); return; }
+      if (k === "enter" && !event.target.matches("input, textarea, [contenteditable='true']") && !els.paletteDialog.open) { els.titleInput.focus(); }
+    }
+
+    function initUrlState() {
+      const params = new URLSearchParams(location.search);
+      const filter = params.get("filter");
+      const query = params.get("q");
+      const sort = params.get("sort");
+      if (filter) state.filter = filter;
+      if (query !== null) state.query = query;
+      if (sort) state.sort = sort;
+      els.searchInput.value = state.query;
+      els.sortSelect.value = state.sort;
+      savePrefs();
+      scheduleRender();
+    }
+
+    function pushUrlState() {
+      const params = new URLSearchParams();
+      if (state.filter !== "all") params.set("filter", state.filter);
+      if (state.query.trim()) params.set("q", state.query.trim());
+      if (state.sort !== "manual") params.set("sort", state.sort);
+      const url = `${location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      history.replaceState(null, "", url);
+    }
+
+    function onChannelMessage(event) {
+      const msg = event.data;
+      if (!msg || typeof msg !== "object") return;
+      if (msg.type === "upsert" && msg.todo) {
+        replaceTodo(normalizeTodo(msg.todo, msg.todo));
+        scheduleRender();
+      }
+      if (msg.type === "delete" && msg.id) {
+        state.todos = state.todos.filter(t => String(t.id) !== String(msg.id));
+        scheduleRender();
+      }
+      if (msg.type === "bulk" && Array.isArray(msg.todos)) {
+        state.todos = normalizeList(msg.todos);
+        scheduleRender();
+      }
+    }
+
+    function broadcast(payload) { channel?.postMessage(payload); }
+    function capitalize(value) { return String(value || "").charAt(0).toUpperCase() + String(value || "").slice(1); }
+    function sortLabel(value) {
+      return ({ manual: "Manual order", "updated-desc": "Recently updated", "created-desc": "Newest first", "created-asc": "Oldest first", "alpha-asc": "A → Z", "alpha-desc": "Z → A" })[value] || value;
+    }
+
+    function relativeTime(iso) {
+      if (!iso) return "just now";
+      const date = new Date(iso);
+      const diff = Math.round((date.getTime() - Date.now()) / 1000);
+      const abs = Math.abs(diff);
+      const unit = abs < 60 ? "second" : abs < 3600 ? "minute" : abs < 86400 ? "hour" : "day";
+      const value = unit === "second" ? diff : unit === "minute" ? Math.round(diff / 60) : unit === "hour" ? Math.round(diff / 3600) : Math.round(diff / 86400);
+      return rtf.format(value, unit);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 </script>
-
 </body>
 </html>
